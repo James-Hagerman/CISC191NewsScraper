@@ -40,7 +40,6 @@ public class NewsScrapper
 {
     public List<JSONObject> getArticles(String keyword, String fromDate, String toDate, String apiKey) throws IOException 
     {
-//    	String apiKey = System.getenv("NEWS_API_KEY");
     	if (apiKey == null)
     	{
     		throw new IllegalStateException("API key not set.");
@@ -84,7 +83,7 @@ public class NewsScrapper
     public static void main(String[] args) throws IOException 
     {
     	NewsScrapper scrapper = new NewsScrapper();
-    	List<JSONObject> articles = scrapper.getArticles("tariffs", "2025-04-02", "2025-04-03", System.getenv("NEWS_API_KEY"));
+    	List<JSONObject> articles = scrapper.getArticles("tariffs", "2025-04-28", "2025-05-10", System.getenv("NEWS_API_KEY"));
     	
     	System.out.println("Top articles:");
     	for (JSONObject article : articles)
