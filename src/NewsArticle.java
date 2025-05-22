@@ -11,18 +11,13 @@
 * Version: 2025-05-17
 */
 
-/**
- * Purpose: The reponsibility of NewsArticle is to hold data for a news article
- *
- * NewsArticle is-a data object
- * NewsArticle is used by the scrapper, database, and search engine
- */
+
 public class NewsArticle
 {
-	public String title; // A NewsArticle HAS-A title
-	public String source; // A NewsArticle HAS-A source
-	public String url; // A NewsArticle HAS-A url
-	public String publishedAt; // A NewsArticle HAS-A publication datetime
+	private String title; // A NewsArticle HAS-A title
+	private String source; // A NewsArticle HAS-A source
+	private String url; // A NewsArticle HAS-A url
+	private String publishedAt; // A NewsArticle HAS-A publication datetime
 	
 	// constructor
 	public NewsArticle(String title, String source, String url, String publishedAt)

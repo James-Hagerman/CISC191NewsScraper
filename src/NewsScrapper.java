@@ -14,84 +14,149 @@
 * https://open.umn.edu/opentextbooks/textbooks/java-java-java-object-oriented-problem-solving
 * https://stackoverflow.com/questions/7048216/environment-variables-in-eclipse
 * https://docs.oracle.com/javase/8/docs/api/java/io/BufferedReader.html
-* <<Add more references here>>
+* https://docs.oracle.com/javase/8/docs/api/java/net/URLEncoder.html
+* https://newsapi.org/docs/endpoints/everything
+* https://docs.oracle.com/javase/8/docs/api/java/nio/charset/StandardCharsets.html
 *
 * Version: 2025-03-21
 */
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime; 
+import java.nio.charset.StandardCharsets;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-/**
- * Purpose: The reponsibility of NewsScrapper is ...
- *
- * NewsScrapper is-a ...
- * NewsScrapper is ...
- */
+
 public class NewsScrapper
-{
-    public List<JSONObject> getArticles(String keyword, String fromDate, String toDate, String apiKey) throws IOException 
+{    
+	/**
+	 * Purpose: 
+	 * @param date - The day to retrieve articles from 
+	 * @param apiKey - key to connect to newsAPI
+	 * @return A list of JSON objects of news articles 
+	 */
+    public List<JSONObject> getArticles(LocalDate date, String apiKey) 
     {
-    	if (apiKey == null)
+    	// List to hold articles 
+    	List<JSONObject> allArticles = new ArrayList<>();
+    	
+    	// Check if api key is missing 
+    	if (apiKey == null) 
     	{
-    		throw new IllegalStateException("API key not set.");
+    		System.out.println("Error: API key is missing");
+    		return allArticles;
     	}
     	
-    	
-    	String endpoint = "https://newsapi.org/v2/everything" +
-    			"?q=" + keyword +
-    			"&from=" + fromDate +
-    			"&to=" + toDate +
-    			"&sortBy=publishedAt&pageSize=5" +
-    			"&apiKey=" + apiKey;
-    	
-    	URL url = new URL(endpoint);
-    	HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    	connection.setRequestMethod("GET");
-    	connection.setRequestProperty("User-Agent", "Mozilla/5.0");
-    	
-    	BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-    	
-    	StringBuilder response = new StringBuilder();
-    	String line;
-    	while ((line = reader.readLine()) != null)
+    	try 
     	{
-    		response.append(line);
+    		// Get US source IDs
+    		String sourceIds = fetchUSSourceIDs(apiKey);
+    		
+    		// Split day into 6 windows to query to increase results
+    		LocalDateTime startOfDay = date.atStartOfDay();
+    		for (int window = 0; window < 6; window++)
+    		{
+    			// Calculate start and end time of current window
+    			LocalDateTime windowStart = startOfDay.plusHours(window * 4);
+    			LocalDateTime windowEnd = windowStart.plusHours(4);
+    			
+    			// URL encode time bounds
+    			String fromParam = URLEncoder.encode(windowStart.toString(), StandardCharsets.UTF_8);
+    			String toParam = URLEncoder.encode(windowEnd.toString(), StandardCharsets.UTF_8);
+    			
+    			// Create endpoint 
+    			String endpoint = "https://newsapi.org/v2/everything" +
+    					"?sources=" + sourceIds +
+    					"&from=" + fromParam +
+    					"&to=" + toParam +
+    					"&pageSize=100" +
+    					"&apiKey=" + URLEncoder.encode(apiKey, StandardCharsets.UTF_8);
+    			
+    			// Open connection and execute GET request with endpoint 
+    			HttpURLConnection conn = (HttpURLConnection)new URL(endpoint).openConnection();
+    			conn.setRequestMethod("GET");
+    			
+    			// Read the response body
+    			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+    			StringBuilder response = new StringBuilder();
+    			String line; 
+    			while ((line = reader.readLine()) != null) 
+    			{
+    				response.append(line);
+    			}
+    			reader.close();
+    			
+    			// Parse the JSON and append each article to the list 
+    			JSONArray articlesArray = new JSONObject(response.toString()).getJSONArray("articles");
+    			for (int i = 0; i < articlesArray.length(); i++) 
+    			{
+    				allArticles.add(articlesArray.getJSONObject(i));
+    			}
+    		}
+    	}
+    	catch (IOException e) 
+    	{
+    		System.err.println("Error getting articles: " + e.getMessage());
+    	}
+    	
+    	return allArticles;
+    }
+    
+    /**
+     * Purpose: Fetch all the source IDs for US sources for use in API endpoint
+     * @param apiKey - key that gives access to the newsAPI
+     * @return String of comma separated source IDs
+     */
+    private String fetchUSSourceIDs(String apiKey) throws IOException 
+    {	
+    	// Endpoint to retrieve sources
+    	String url = "https://newsapi.org/v2/sources?country=us&apiKey=" +
+    			URLEncoder.encode(apiKey, StandardCharsets.UTF_8);
+    	
+    	// Open connection and get 
+    	HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+    	conn.setRequestMethod("GET");
+    	
+    	// Read the response body
+    	BufferedReader reader = new BufferedReader(
+    			new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8)
+    			);
+    	StringBuilder sourcesString = new StringBuilder();
+    	String line;
+    	
+    	while ((line = reader.readLine()) != null) 
+    	{
+    		sourcesString.append(line);
     	}
     	reader.close();
     	
-    	JSONObject json = new JSONObject(response.toString());
-    	JSONArray articles = json.getJSONArray("articles");
-    	
-    	List<JSONObject> results = new ArrayList<>();
-    	for (int i = 0; i < articles.length(); i++)
-    	{
-    		results.add(articles.getJSONObject(i));
-    	}
-    	
-    	return results;
-    }
-    
-    public static void main(String[] args) throws IOException 
-    {
-    	NewsScrapper scrapper = new NewsScrapper();
-    	List<JSONObject> articles = scrapper.getArticles("tariffs", "2025-04-28", "2025-05-10", System.getenv("NEWS_API_KEY"));
-    	
-    	System.out.println("Top articles:");
-    	for (JSONObject article : articles)
-    	{
-    		System.out.println("\nTitle: " + article.getString("title"));
-            System.out.println("Source: " + article.getJSONObject("source").getString("name"));
-            System.out.println("Date: " + article.getString("publishedAt"));
-            System.out.println("Link: " + article.getString("url"));
-    	}
+    	// parse JSON and gather the source IDs and build comma separated list 
+	    JSONArray sourceArray = new JSONObject(sourcesString.toString()).getJSONArray("sources");
+	    StringBuilder sourcesIds = new StringBuilder();
+	    for (int i = 0; i < sourceArray.length(); i++) 
+	    {
+	    	if (i > 0)
+	    	{
+	    		sourcesIds.append(',');
+	    	}
+	    	String id = sourceArray.getJSONObject(i).getString("id");
+	    	sourcesIds.append(id);
+	    }
+	    
+	    return sourcesIds.toString();
     }
 }
+
+
+
+
