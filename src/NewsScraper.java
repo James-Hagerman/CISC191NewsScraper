@@ -1,12 +1,6 @@
 /**
 * Lead Author(s):
-* @author james; student ID
-* @author Full name; student ID
-* <<Add additional lead authors here>>
-*
-* Other Contributors:
-* Full name; student ID or contact information if not in class
-* <<Add additional contributors (mentors, tutors, friends) here, with contact information>>
+* @author James Hagerman 
 *
 * References:
 * Morelli, R., & Walde, R. (2016).
@@ -17,6 +11,16 @@
 * https://docs.oracle.com/javase/8/docs/api/java/net/URLEncoder.html
 * https://newsapi.org/docs/endpoints/everything
 * https://docs.oracle.com/javase/8/docs/api/java/nio/charset/StandardCharsets.html
+* https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html
+* https://docs.oracle.com/javase/8/docs/api/java/io/InputStreamReader.html
+* https://docs.oracle.com/javase/8/docs/api/java/net/HttpURLConnection.html
+* https://docs.oracle.com/javase/7/docs/api/java/net/URL.html
+* https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html
+* https://docs.oracle.com/javase/8/docs/api/java/util/List.html
+* https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html
+* https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html
+* https://www.tutorialspoint.com/org_json/org_json_jsonarray.htm
+* https://www.tutorialspoint.com/org_json/org_json_quick_guide.htm
 *
 * Version: 2025-03-21
 */
@@ -37,7 +41,7 @@ import java.nio.charset.StandardCharsets;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class NewsScrapper
+public class NewsScraper
 {    
 	/**
 	 * Purpose: 

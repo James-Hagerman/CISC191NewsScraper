@@ -1,19 +1,20 @@
 /**
 * Lead Author(s):
-* @author james; student ID
-* @author Full name; student ID
-* <<Add additional lead authors here>>
-*
-* Other Contributors:
-* Full name; student ID or contact information if not in class
-* <<Add additional contributors (mentors, tutors, friends) here, with contact information>>
+* @author James Hagerman
 *
 * References:
 * Morelli, R., & Walde, R. (2016).
 * Java, Java, Java: Object-Oriented Problem Solving
 * https://open.umn.edu/opentextbooks/textbooks/java-java-java-object-oriented-problem-solving
-*
-* <<Add more references here>>
+* https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html
+* https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html
+* https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html
+* https://docs.oracle.com/javase/8/docs/api/java/nio/file/Paths.html
+* https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html
+* https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html
+* https://docs.oracle.com/javase/8/docs/api/java/util/List.html
+* https://www.tutorialspoint.com/org_json/org_json_jsonarray.htm
+* https://www.tutorialspoint.com/org_json/org_json_quick_guide.htm
 *
 * Version: 2025-05-17
 */
@@ -32,11 +33,11 @@ import org.json.JSONObject;
 public class NewsDatabase
 {
 	private Path storageDirectory; // A NewsDatabase HAS-A directory where JSON files are stored
-	private NewsScrapper scrapper; // A NewsDatabase HAS-A helper method for fetching articles from the api
+	private NewsScraper scrapper; // A NewsDatabase HAS-A helper method for fetching articles from the api
 	private String apiKey = System.getenv("NEWS_API_KEY"); // A NewsDatabase HAS-AN API key for connecting to the api
 	
 	// Constructor 
-	public NewsDatabase(String directory, NewsScrapper scrapper) throws IOException
+	public NewsDatabase(String directory, NewsScraper scrapper) throws IOException
 	{
 		this.storageDirectory = Paths.get(directory);
 		this.scrapper = scrapper;

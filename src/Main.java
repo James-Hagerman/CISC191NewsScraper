@@ -1,19 +1,14 @@
 /**
 * Lead Author(s):
-* @author james; student ID
-* @author Full name; student ID
-* <<Add additional lead authors here>>
-*
-* Other Contributors:
-* Full name; student ID or contact information if not in class
-* <<Add additional contributors (mentors, tutors, friends) here, with contact information>>
+* @author James Hagerman
 *
 * References:
 * Morelli, R., & Walde, R. (2016).
 * Java, Java, Java: Object-Oriented Problem Solving
 * https://open.umn.edu/opentextbooks/textbooks/java-java-java-object-oriented-problem-solving
-*
-* <<Add more references here>>
+* https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html
+* https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html
+* https://docs.oracle.com/javase/8/docs/api/java/util/List.html
 *
 * Version: 2025-05-18
 */
@@ -34,7 +29,7 @@ public class Main
 		
 		// Create scrapper, database, and search engine objects
 		String storageDirectory = "news-storage";
-		NewsScrapper scrapper = new NewsScrapper();
+		NewsScraper scrapper = new NewsScraper();
 		NewsDatabase db = new NewsDatabase(storageDirectory, scrapper);
 		SearchEngine engine = new SearchEngine(db);
 		
