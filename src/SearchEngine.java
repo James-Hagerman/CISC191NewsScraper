@@ -37,28 +37,46 @@ public class SearchEngine
 	 * @param toDate - ending date to search for
 	 * @return List of news articles 
 	 */
-	public List<NewsArticle> search(String keyword, LocalDate fromDate, LocalDate toDate) throws IOException
+	public List<NewsArticle> search(List<ArticleFilter> filters, String keyword, LocalDate fromDate, LocalDate toDate) throws IOException
 	{
 		// Empty list to hold news article objects
 		List<NewsArticle> results = new ArrayList<>();
-		// convert keyword to lowercase
-		String searchKeyword = keyword.toLowerCase();
 		
 		// iterate through each date in the passed range
 		for (LocalDate date = fromDate; !date.isAfter(toDate); date = date.plusDays(1))
 		{
-			// load all articles for current date
-			List<NewsArticle> dayArticles = db.loadArticlesForDay(date);
+			// Initialize articles list outside try block 
+			List<NewsArticle> dayArticles;
 			
-			// check each article for the keyword in the title or source 
-			for (int i = 0; i < dayArticles.size(); i++) 
+			try 
 			{
-				NewsArticle article = dayArticles.get(i);
-				String title = article.getTitle().toLowerCase();
-				String source = article.getSource().toLowerCase();
+			// load all articles for current date
+				dayArticles = db.loadArticlesForDay(date);
+			}
+			catch (IOException e)
+			{
+				e.getMessage();
+				continue;
+			}
+			
+			// Iterate through each article on current date
+			for (NewsArticle article : dayArticles) 
+			{
+				// assume article should be included
+				boolean include = true;
 				
-				// If title or source contains keyword include current article 
-				if (title.contains(searchKeyword) || source.contains(searchKeyword))
+				// loop through each filter in filter list
+				for (ArticleFilter f : filters) 
+				{
+					// if filter isnt true dont include article
+					if (!f.matches(article)) 
+					{
+						include = false;
+						break;
+					}
+				}
+				// if include is true add article to results
+				if (include) 
 				{
 					results.add(article);
 				}
@@ -68,4 +86,5 @@ public class SearchEngine
 		// return all results 
 		return results;
 	}
+	
 }

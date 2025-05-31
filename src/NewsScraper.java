@@ -52,7 +52,7 @@ public class NewsScraper
     public List<JSONObject> getArticles(LocalDate date, String apiKey) 
     {
     	// List to hold articles 
-    	List<JSONObject> allArticles = new ArrayList<>();
+    	List<JSONObject> allArticles = new ArrayList<>(); // getArticles HAS-A list of JSON object that are articles
     	
     	// Check if api key is missing 
     	if (apiKey == null) 
@@ -68,11 +68,11 @@ public class NewsScraper
     		
     		// Split day into 6 windows to query to increase results
     		LocalDateTime startOfDay = date.atStartOfDay();
-    		for (int window = 0; window < 6; window++)
+    		for (int window = 0; window < 4; window++)
     		{
     			// Calculate start and end time of current window
-    			LocalDateTime windowStart = startOfDay.plusHours(window * 4);
-    			LocalDateTime windowEnd = windowStart.plusHours(4);
+    			LocalDateTime windowStart = startOfDay.plusHours(window * 6);
+    			LocalDateTime windowEnd = windowStart.plusHours(6);
     			
     			// URL encode time bounds
     			String fromParam = URLEncoder.encode(windowStart.toString(), StandardCharsets.UTF_8);
