@@ -1,27 +1,21 @@
 /**
 * Lead Author(s):
-* @author james; student ID
-* @author Full name; student ID
-* <<Add additional lead authors here>>
-*
-* Other Contributors:
-* Full name; student ID or contact information if not in class
-* <<Add additional contributors (mentors, tutors, friends) here, with contact information>>
-*
+* @author james Hagerman 
+* 
 * References:
 * Morelli, R., & Walde, R. (2016).
 * Java, Java, Java: Object-Oriented Problem Solving
 * https://open.umn.edu/opentextbooks/textbooks/java-java-java-object-oriented-problem-solving
+* https://ioflood.com/blog/json-to-java-object/
+* 
 *
-* <<Add more references here>>
-*
-* Version: 2025-05-31
+* Version: 2025-05-17
 */
 
 /**
  * Purpose: Matches articles whose source or title contains given keyword
  */
-public class TitleOrSourceFilter implements ArticleFilter
+public class TitleOrSourceFilter implements ArticleFilter // A TitleOrSourceFilter IS-AN article filter
 {
 	private String keywordLower; // A title or source filter HAS-A keyword
 	

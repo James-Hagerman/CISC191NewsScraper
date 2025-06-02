@@ -38,6 +38,7 @@ public class NewsScraperGUI extends JFrame
 	private JTextField toField; // A NewsScraperGUI HAS-A to date field
 	private JButton searchButton; // A NewsScraperGUI HAS-A search button
 	private JComboBox<String> searchBy; // A NewsScraperGUI HAS-A search by modifier
+	private JLabel resultCount; // A NewsScraperGUI HAS-A result count
 	
 	private DefaultTableModel tableModel; // A NewsScraperGUI HAS-A 2D array to store data
 	private JTable table; // A NewsScraperGUI HAS-A view of the table data
@@ -64,8 +65,12 @@ public class NewsScraperGUI extends JFrame
 		add(createTopPanel(), BorderLayout.NORTH);
 		// Add result table 
 		add(createTableScrollPane(), BorderLayout.CENTER);
+		// Add result count panel
+		add(createResultCountPanel(), BorderLayout.SOUTH);
 		// connect search listener
 		searchListener();
+		
+		setColumns();
 		
 		// show window 
 		setVisible(true);
@@ -125,6 +130,21 @@ public class NewsScraperGUI extends JFrame
 	}
 	
 	/**
+	 * Purpose: create panel that holds the result count 
+	 * @return result count panel 
+	 */
+	private JPanel createResultCountPanel() 
+	{
+		// Create new panel
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		// Create new result count label 
+		resultCount = new JLabel("Resutls: 0");
+		// Add result count label to panel 
+		panel.add(resultCount);
+		return panel;
+	}
+	
+	/**
 	 * Purpose: Set preferred width on columns in the table
 	 */
 	private void setColumns() 
@@ -179,6 +199,7 @@ public class NewsScraperGUI extends JFrame
 		String from = fromField.getText().trim();
 		String to = toField.getText().trim();
 		
+		
 		// create list of filters based on the search by choice
 		List<ArticleFilter> filters = new ArrayList<>();
 		String choice = (String) searchBy.getSelectedItem();
@@ -208,6 +229,20 @@ public class NewsScraperGUI extends JFrame
 			// parse dates
 			LocalDate fromDate = LocalDate.parse(from);
 			LocalDate toDate = LocalDate.parse(to);
+			
+			LocalDate today = LocalDate.now();
+			LocalDate oneMonthAgo = today.minusMonths(1);
+			LocalDate oneWeekAgo = today.minusWeeks(1);
+			
+			if (fromDate.isBefore(oneMonthAgo) ||
+				fromDate.isAfter(oneWeekAgo) ||
+				toDate.isBefore(oneMonthAgo) ||
+				toDate.isAfter(oneWeekAgo) ||
+				toDate.isBefore(fromDate))
+			{
+				throw new DateRangeException("Dates must be between " + oneMonthAgo + " and " + oneWeekAgo + ",\n" + 
+											 "and \"" + toDate + "\" cannot be before \"" + fromDate + "\".");
+			}
 			
 			// Perform search 
 			List<NewsArticle> searchList = engine.search(filters, keyword, fromDate, toDate);
@@ -239,6 +274,9 @@ public class NewsScraperGUI extends JFrame
 			}
 			// set column widths after loading new data
 			setColumns();
+			
+			// Update result count
+			resultCount.setText("Results: " + searchList.size());
 		}
         catch (java.time.format.DateTimeParseException dtpe) {
             JOptionPane.showMessageDialog(
@@ -248,6 +286,16 @@ public class NewsScraperGUI extends JFrame
                 JOptionPane.ERROR_MESSAGE
             );
         }
+		catch (DateRangeException dre) 
+		{
+			JOptionPane.showMessageDialog(
+				this,
+				dre.getMessage(),
+				"Invalid Date Range", 
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
+		// catch all other exceptions that bubble up from backend
         catch (IOException e) {
             JOptionPane.showMessageDialog(
                 this,

@@ -16,6 +16,7 @@
 
 
 import java.io.IOException;
+import org.json.JSONException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class SearchEngine
 	 * @param toDate - ending date to search for
 	 * @return List of news articles 
 	 */
-	public List<NewsArticle> search(List<ArticleFilter> filters, String keyword, LocalDate fromDate, LocalDate toDate) throws IOException
+	public List<NewsArticle> search(List<ArticleFilter> articleFilters, String keyword, LocalDate fromDate, LocalDate toDate) throws IOException
 	{
 		// Empty list to hold news article objects
 		List<NewsArticle> results = new ArrayList<>();
@@ -45,19 +46,7 @@ public class SearchEngine
 		// iterate through each date in the passed range
 		for (LocalDate date = fromDate; !date.isAfter(toDate); date = date.plusDays(1))
 		{
-			// Initialize articles list outside try block 
-			List<NewsArticle> dayArticles;
-			
-			try 
-			{
-			// load all articles for current date
-				dayArticles = db.loadArticlesForDay(date);
-			}
-			catch (IOException e)
-			{
-				e.getMessage();
-				continue;
-			}
+			List<NewsArticle> dayArticles = db.loadArticlesForDay(date);
 			
 			// Iterate through each article on current date
 			for (NewsArticle article : dayArticles) 
@@ -66,13 +55,12 @@ public class SearchEngine
 				boolean include = true;
 				
 				// loop through each filter in filter list
-				for (ArticleFilter f : filters) 
+				for (ArticleFilter filter : articleFilters) 
 				{
 					// if filter isnt true dont include article
-					if (!f.matches(article)) 
+					if (!filter.matches(article)) 
 					{
 						include = false;
-						break;
 					}
 				}
 				// if include is true add article to results
